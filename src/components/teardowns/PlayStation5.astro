@@ -1,0 +1,368 @@
+---
+// Scroll-driven product teardown. Animation is driven by the shared script in
+// src/pages/case-studies/[slug].astro: give an element class `r` to reveal it.
+
+const rice = [
+  { name: 'Picture Check', reach: 8, impact: 2, conf: 50, effort: 3, verdict: 'Build first' },
+  { name: 'Smoothness labels', reach: 9, impact: 1, conf: 50, effort: 2, verdict: 'Phase 2' },
+  { name: 'Mode preview', reach: 6, impact: 1, conf: 80, effort: 5, verdict: 'Later' },
+  { name: 'Boost mode', reach: 9, impact: 2, conf: 20, effort: 8, verdict: 'Rejected' },
+].map((r) => ({ ...r, score: (r.reach * r.impact * (r.conf / 100)) / r.effort }));
+const maxScore = Math.max(...rice.map((r) => r.score));
+---
+<article class="story">
+  <!-- 00 Cover -->
+  <header class="story-cover wrap">
+    <div class="story-cover__copy">
+      <p class="eyebrow">Product teardown · self-initiated</p>
+      <h1>Making a PS5 feel faster <em>without touching the hardware.</em></h1>
+      <p class="lede">
+        The brief asked how to improve PlayStation 5 performance and graphics. Hardware can't
+        change in a console players already own, so I looked for the gap between what a PS5 can
+        do and what players actually get.
+      </p>
+    </div>
+
+    <figure class="tv tv--cover" aria-label="Illustration: a game asks the player to choose a graphics mode">
+      <div class="tv__screen">
+        <div class="mode-prompt">
+          <p class="mode-prompt__title">Choose a graphics mode</p>
+          <div class="mode-prompt__opt mode-prompt__opt--a"><strong>Fidelity</strong><span>Higher resolution, ray tracing</span></div>
+          <div class="mode-prompt__opt mode-prompt__opt--b"><strong>Performance</strong><span>Higher frame rate</span></div>
+        </div>
+      </div>
+      <div class="tv__stand" aria-hidden="true"></div>
+      <p class="thought thought--cover">…which one is better?</p>
+    </figure>
+  </header>
+
+  <!-- 01 Brief -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">01 · The brief</p>
+    <h2 class="r" style="--d:1">Clarify before solving</h2>
+    <p class="chapter__note r" style="--d:2">This is an exercise, so the answers below are my working assumptions, not Sony's.</p>
+
+    <div class="chat">
+      <div class="msg msg--them r" style="--d:3">
+        <span class="avatar" aria-hidden="true">PL</span>
+        <p class="bubble"><span class="bubble__who">Platform lead (hypothetical)</span>Players want better performance and graphics on PS5. What would you improve?</p>
+      </div>
+      <div class="msg msg--me r" style="--d:5">
+        <p class="bubble">Before I suggest anything, four questions.</p>
+        <span class="avatar avatar--me" aria-hidden="true">AJ</span>
+      </div>
+      <ol class="qa">
+        <li class="r" style="--d:7"><p class="qa__q">Which players: standard PS5 or PS5 Pro?</p><p class="qa__a"><span>Assumed</span>Standard PS5. The Pro launched in November 2024 at €799.99 and already targets enthusiasts.</p></li>
+        <li class="r" style="--d:8"><p class="qa__q">Are hardware changes in scope?</p><p class="qa__a"><span>Assumed</span>No. A console in someone's living room is fixed. New hardware means a new SKU, which already exists.</p></li>
+        <li class="r" style="--d:9"><p class="qa__q">What does "performance" mean to a player?</p><p class="qa__a"><span>Assumed</span>Smooth, consistent motion and getting into a game quickly, not benchmark scores.</p></li>
+        <li class="r" style="--d:10"><p class="qa__q">What is the time horizon?</p><p class="qa__a"><span>Assumed</span>Something that can ship in a system update within two quarters.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 02 Reframe -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">02 · Reframe</p>
+    <h2 class="r" style="--d:1">The hardware is fixed. The experience isn't.</h2>
+    <p class="chapter__lede r" style="--d:2">
+      Three layers decide how a game looks and feels on a PS5. Only one of them can be
+      changed for every player at once.
+    </p>
+    <div class="layers">
+      <div class="layer layer--fixed r" style="--d:3">
+        <p class="layer__name">Console hardware</p>
+        <p class="layer__who">Fixed for this generation</p>
+      </div>
+      <div class="layer layer--studio r" style="--d:4">
+        <p class="layer__name">Game code</p>
+        <p class="layer__who">Owned by each studio, one game at a time</p>
+      </div>
+      <div class="layer layer--lever r" style="--d:5">
+        <p class="layer__name">System software</p>
+        <p class="layer__who">Owned by the platform, updated over the air for every console</p>
+        <span class="layer__tag">Our lever</span>
+      </div>
+    </div>
+    <p class="pull r" style="--d:7">
+      New question: <strong>how do we help players get the performance their console and TV can already deliver?</strong>
+    </p>
+  </section>
+
+  <!-- 03 Journey -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">03 · A player's evening</p>
+    <h2 class="r" style="--d:1">Where the performance gets lost</h2>
+    <p class="chapter__note r" style="--d:2">Jonas is an illustrative persona. Each step is a hypothesis to test, not a finding.</p>
+
+    <ol class="comic">
+      <li class="panel r" style="--d:3">
+        <div class="panel__art art-tv-box" aria-hidden="true">
+          <div class="box"><span>NEW TV</span><em>4K · 120 Hz · VRR</em></div>
+        </div>
+        <p class="panel__caption"><b>1.</b> Jonas buys a new TV that supports 120 Hz and VRR.</p>
+        <p class="bubble bubble--small">Games are going to look incredible.</p>
+      </li>
+      <li class="panel r" style="--d:4">
+        <div class="panel__art art-hdmi" aria-hidden="true">
+          <div class="ports"><span>HDMI 1</span><span class="is-used">HDMI 2</span><span>HDMI 3</span><span>HDMI 4</span></div>
+        </div>
+        <p class="panel__caption"><b>2.</b> He plugs the PS5 into a free port and never opens video settings.</p>
+        <p class="bubble bubble--small">Done. It works.</p>
+      </li>
+      <li class="panel r" style="--d:5">
+        <div class="panel__art art-prompt" aria-hidden="true">
+          <div class="mini-prompt"><span class="pick">Fidelity</span><span>Performance</span></div>
+        </div>
+        <p class="panel__caption"><b>3.</b> The game asks him to pick a mode. Fidelity sounds better, so he picks it.</p>
+        <p class="bubble bubble--small">Higher quality, obviously.</p>
+      </li>
+      <li class="panel r" style="--d:6">
+        <div class="panel__art art-fps" aria-hidden="true">
+          <svg viewBox="0 0 200 90" class="fps-svg">
+            <line x1="10" y1="20" x2="190" y2="20" class="fps-target" />
+            <text x="12" y="15" class="fps-label">his TV could show 120 fps</text>
+            <polyline class="fps-line" points="10,70 30,68 50,72 70,66 90,71 110,69 130,73 150,67 170,70 190,69" />
+            <text x="12" y="86" class="fps-label">he plays at a 30 fps target</text>
+          </svg>
+        </div>
+        <p class="panel__caption"><b>4.</b> He plays at 30 fps on a screen built for 120, and blames the console.</p>
+        <p class="bubble bubble--small">Why does it feel sluggish?</p>
+      </li>
+    </ol>
+
+    <div class="pains">
+      <p class="eyebrow r" style="--d:7">Pain points</p>
+      <ul>
+        <li class="r" style="--d:8"><b>A choice without information.</b> Players pick a mode before they have seen what either looks like on their screen.</li>
+        <li class="r" style="--d:9"><b>Invisible capability.</b> Players often don't know whether their TV supports 120 Hz or VRR, or which port or cable they need.</li>
+        <li class="r" style="--d:10"><b>Settings in three places.</b> The system-wide Game Presets, video output settings and each game's own menu all affect the result.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 04 Evidence plan -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">04 · What I would need to believe</p>
+    <h2 class="r" style="--d:1">Three hypotheses, tested before building</h2>
+    <p class="chapter__lede r" style="--d:2">If the first one is false, the strategy changes, so it gets tested first and cheapest.</p>
+    <ol class="hyps">
+      <li class="hyp r" style="--d:3">
+        <p class="hyp__id">H1</p>
+        <p class="hyp__claim">Many players with 120 Hz-capable displays play in a 30 fps mode they didn't actively choose.</p>
+        <p class="hyp__test"><span>Test</span>Telemetry: mode in use by display capability, and whether the mode was ever changed.</p>
+      </li>
+      <li class="hyp r" style="--d:4">
+        <p class="hyp__id">H2</p>
+        <p class="hyp__claim">Players who switch to a higher frame-rate mode play longer and switch back rarely.</p>
+        <p class="hyp__test"><span>Test</span>Telemetry: session length and switch-back rate for players who changed mode on their own.</p>
+      </li>
+      <li class="hyp r" style="--d:5">
+        <p class="hyp__id">H3</p>
+        <p class="hyp__claim">Players don't know their TV's capabilities, and a plain-language explanation changes their choice.</p>
+        <p class="hyp__test"><span>Test</span>8 to 10 in-home sessions: ask what their TV supports, then show a recommendation.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 05 Options -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">05 · Options</p>
+    <h2 class="r" style="--d:1">Four ways to close the gap</h2>
+    <div class="options">
+      <article class="option r" style="--d:2">
+        <div class="option__art">
+          <div class="check-list">
+            <p>Checking your TV</p>
+            <span style="--k:0">4K</span><span style="--k:1">HDR</span><span style="--k:2">120 Hz</span><span style="--k:3">VRR</span>
+          </div>
+        </div>
+        <h3>A. Picture Check</h3>
+        <p>When the console detects a display, it reads what the TV reports over HDMI and recommends a mode in plain language.</p>
+      </article>
+      <article class="option r" style="--d:3">
+        <div class="option__art">
+          <div class="tile">
+            <span class="tile__cover"></span>
+            <span class="tile__badges"><i>Targets 60 fps</i><i>120 Hz mode</i><i>VRR</i></span>
+          </div>
+        </div>
+        <h3>B. Smoothness labels</h3>
+        <p>Every game hub shows its target frame rate per mode, declared by the developer, so expectations are set before playing.</p>
+      </article>
+      <article class="option r" style="--d:4">
+        <div class="option__art">
+          <div class="split"><span class="split__a">Resolution</span><span class="split__b">Performance</span><i class="split__bar"></i></div>
+        </div>
+        <h3>C. Mode preview</h3>
+        <p>Before choosing, the player sees a short side-by-side clip of both modes running on their own screen.</p>
+      </article>
+      <article class="option option--rejected r" style="--d:5">
+        <div class="option__art">
+          <div class="gauge"><span class="gauge__fill"></span><em>thermal headroom</em></div>
+        </div>
+        <h3>D. Boost mode</h3>
+        <p>An opt-in setting that raises clock speeds. Games are built and certified against a fixed spec, so this risks stability for every title.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 06 Prioritise -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">06 · Prioritise</p>
+    <h2 class="r" style="--d:1">RICE, with the uncertainty left in</h2>
+    <p class="chapter__note r" style="--d:2">
+      My estimates, not data. Reach and Impact on a 1 to 10 and 0.25 to 3 scale, Effort in team-months.
+      Telemetry from H1 would replace the Reach column.
+    </p>
+    <div class="rice r" style="--d:3" role="table" aria-label="RICE scores">
+      <div class="rice__row rice__row--head" role="row">
+        <span role="columnheader">Option</span><span role="columnheader">R</span><span role="columnheader">I</span><span role="columnheader">C</span><span role="columnheader">E</span><span role="columnheader">Score</span>
+      </div>
+      {rice.map((r, i) => (
+        <div class:list={['rice__row', { 'is-top': i === 0, 'is-out': r.verdict === 'Rejected' }]} role="row" style={`--d:${4 + i}`}>
+          <span role="cell" class="rice__name">{r.name}<em>{r.verdict}</em><em class="rice__inline">R {r.reach} · I {r.impact} · C {r.conf}% · E {r.effort}</em></span>
+          <span role="cell">{r.reach}</span>
+          <span role="cell">{r.impact}</span>
+          <span role="cell">{r.conf}%</span>
+          <span role="cell">{r.effort}</span>
+          <span role="cell" class="rice__score">
+            <i style={`--w:${(r.score / maxScore).toFixed(3)}`}></i>
+            <b>{r.score.toFixed(2)}</b>
+          </span>
+        </div>
+      ))}
+    </div>
+    <div class="reasons">
+      <p class="r" style="--d:9"><b>Picture Check goes first.</b> It reaches every player with a capable display, needs no work from studios, and its result directly tests H1 and H3.</p>
+      <p class="r" style="--d:10"><b>Smoothness labels come next.</b> Cheap for the platform, but they depend on developers declaring data, so they need a partner programme.</p>
+      <p class="r" style="--d:11"><b>Boost mode is out.</b> Big upside on paper, but low confidence and high risk to every certified game.</p>
+    </div>
+  </section>
+
+  <!-- 07 MVP -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">07 · The MVP</p>
+    <h2 class="r" style="--d:1">Picture Check in three screens</h2>
+
+    <ol class="flow">
+      <li class="r" style="--d:2">
+        <figure class="tv tv--small">
+          <div class="tv__screen screen-pad">
+            <p class="scr-title">New display detected</p>
+            <p class="scr-body">Want to check what it can do? It takes a few seconds.</p>
+            <span class="scr-btn">Check my TV</span>
+          </div>
+        </figure>
+        <p class="flow__cap"><b>Trigger.</b> A new display is detected, or a game with modes is launched for the first time.</p>
+      </li>
+      <li class="r" style="--d:3">
+        <figure class="tv tv--small">
+          <div class="tv__screen screen-pad">
+            <p class="scr-title">Your TV supports</p>
+            <ul class="scr-checks">
+              <li style="--k:0">4K resolution</li><li style="--k:1">HDR</li><li style="--k:2">120 Hz</li><li style="--k:3">Variable refresh rate</li>
+            </ul>
+          </div>
+        </figure>
+        <p class="flow__cap"><b>Check.</b> Read the capabilities the TV reports. If 120 Hz isn't reported, show one tip about HDMI 2.1 ports and cables.</p>
+      </li>
+      <li class="r" style="--d:4">
+        <figure class="tv tv--small">
+          <div class="tv__screen screen-pad">
+            <p class="scr-title">We recommend Performance</p>
+            <p class="scr-body">Your TV can show up to 120 fps. Games that offer it will feel smoother.</p>
+            <span class="scr-btn">Use Performance</span><span class="scr-btn scr-btn--ghost">Keep Resolution</span>
+          </div>
+        </figure>
+        <p class="flow__cap"><b>Recommend.</b> One choice that sets the existing Game Presets setting. Changeable any time.</p>
+      </li>
+    </ol>
+
+    <div class="spec">
+      <div class="r" style="--d:5">
+        <p class="eyebrow">Must</p>
+        <ul>
+          <li>Never change a setting without the player's consent</li>
+          <li>Write to the existing Game Presets, not a new setting</li>
+          <li>Say nothing when the TV's report is uncertain</li>
+          <li>Show at most once per display, dismissible for good</li>
+        </ul>
+      </div>
+      <div class="r" style="--d:6">
+        <p class="eyebrow">Out of scope</p>
+        <ul>
+          <li>Per-game tuning</li>
+          <li>Store and game-hub labels (phase 2)</li>
+          <li>Anything specific to PS5 Pro</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 Metrics -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">08 · Measuring it</p>
+    <h2 class="r" style="--d:1">One north star, three inputs, two guardrails</h2>
+    <div class="tree">
+      <div class="tree__root r" style="--d:2">
+        <p class="eyebrow">North star</p>
+        <p class="tree__metric">Share of play time in the mode that suits the player's display</p>
+      </div>
+      <div class="tree__lines r" style="--d:3" aria-hidden="true"><span></span></div>
+      <div class="tree__kids">
+        <div class="tree__node r" style="--d:4"><p class="eyebrow">Input</p><p>Picture Check completion rate</p></div>
+        <div class="tree__node r" style="--d:5"><p class="eyebrow">Input</p><p>Recommendation acceptance rate</p></div>
+        <div class="tree__node r" style="--d:6"><p class="eyebrow">Input</p><p>Switch-back within 7 days (lower is better)</p></div>
+      </div>
+      <div class="tree__guards">
+        <div class="tree__node tree__node--guard r" style="--d:7"><p class="eyebrow">Guardrail</p><p>Display-related support contacts</p></div>
+        <div class="tree__node tree__node--guard r" style="--d:8"><p class="eyebrow">Guardrail</p><p>Average session length</p></div>
+      </div>
+    </div>
+    <p class="chapter__lede r" style="--d:9">
+      <b>Rollout:</b> a staged system update with a holdout group. Ship widely if the north star rises
+      and switch-backs stay low. I would set both thresholds only after a two-week baseline.
+    </p>
+  </section>
+
+  <!-- 09 Risks -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">09 · Risks</p>
+    <h2 class="r" style="--d:1">What could go wrong</h2>
+    <dl class="risks">
+      <div class="r" style="--d:2"><dt>H1 is false</dt><dd>Most players already use the right mode. Stop, and put the effort into smoothness labels instead.</dd></div>
+      <div class="r" style="--d:3"><dt>Some players prefer fidelity</dt><dd>Some people want the sharpest image. The prompt appears once, respects their choice, and never re-asks.</dd></div>
+      <div class="r" style="--d:4"><dt>TVs report capabilities badly</dt><dd>Recommend only when the reported capabilities are unambiguous, and log the rest to improve detection.</dd></div>
+      <div class="r" style="--d:5"><dt>Games name modes differently</dt><dd>Act only through Game Presets, which applies just to games that support it.</dd></div>
+    </dl>
+  </section>
+
+  <!-- 10 Epilogue -->
+  <section class="chapter wrap">
+    <p class="chapter__num r" style="--d:0">10 · Same evening, after the update</p>
+    <div class="epilogue">
+      <figure class="tv tv--epi r" style="--d:1">
+        <div class="tv__screen screen-pad">
+          <p class="scr-title">We recommend Performance</p>
+          <p class="scr-body">Your TV can show up to 120 fps.</p>
+          <span class="scr-btn scr-btn--pressed">Use Performance</span>
+        </div>
+      </figure>
+      <div class="epilogue__talk">
+        <p class="bubble r" style="--d:3">Wait, my TV could do that all along?</p>
+        <p class="bubble r" style="--d:5">That's so much smoother.</p>
+        <p class="epilogue__note r" style="--d:7">Same console, same TV, same game. The only change was a system update.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Credits -->
+  <footer class="wrap story-credits">
+    <div class="r" style="--d:0">
+      <p class="eyebrow">What I would do first</p>
+      <p>Run the H1 telemetry query, which takes about a week, before any design work. That single number decides whether this project should exist.</p>
+      <p class="story-credits__fine">Independent exercise. Not affiliated with or endorsed by Sony Interactive Entertainment. All screens are illustrations.</p>
+    </div>
+  </footer>
+</article>
+

@@ -1,0 +1,348 @@
+---
+// Airbnb booking-flow teardown through Csikszentmihalyi's flow lens.
+// Screenshots: captured by Aditya's session on 12 Nov 2026 (mobile web, logged out,
+// en-GB, Lisbon, 3 nights, 2 adults). Hosts' and guests' names and photos are blurred.
+// Animation is driven by the shared script in src/pages/case-studies/[slug].astro.
+
+const img = (f: string) => `/images/case-studies/airbnb/${f}.jpg`;
+
+type Pin = { top: number; left: number; note: string };
+type Shot = { file: string; alt: string; pins: Pin[] };
+
+const keeps: { title: string; condition: string; body: string; shot: Shot }[] = [
+  {
+    title: 'The price you see is the price you pay',
+    condition: 'Clear goals · immediate feedback',
+    body: 'From the first page of results, each card shows the total for the whole stay, not a nightly rate that grows at checkout. "Pay €0 today" and "Free cancellation" sit beside it, so the real cost of committing is known before tapping in.',
+    shot: {
+      file: '02-results-price',
+      alt: 'Airbnb search results on mobile showing a listing card with a total price of 258 euros, pay 0 euros today and free cancellation',
+      pins: [
+        { top: 43.5, left: 35, note: 'Total for 3 nights, taxes included' },
+        { top: 47.5, left: 57, note: 'Cost of committing now: €0, and free to cancel' },
+      ],
+    },
+  },
+  {
+    title: 'Long listings, compressed',
+    condition: 'Concentration on the task',
+    body: 'The host\'s description runs to several paragraphs. Above it, AI-written "Listing highlights" compress it into three scannable points, and a "Learn more about summaries" link explains where they come from.',
+    shot: {
+      file: '05-listing-highlights',
+      alt: 'Airbnb listing page showing three listing highlights summarised from the listing, with a link to learn more about summaries',
+      pins: [
+        { top: 23, left: 8, note: 'Three highlights instead of the full description' },
+        { top: 68, left: 8, note: 'Says how the summaries are made' },
+      ],
+    },
+  },
+  {
+    title: '277 reviews, read for you',
+    condition: 'Concentration · balance of challenge and skill',
+    body: 'Nobody reads 277 reviews. "Guests mention" turns them into topics with counts, such as Walkability and Hospitality, so a guest can check what they care about and go deeper only when they want to.',
+    shot: {
+      file: '07-guests-mention',
+      alt: 'Airbnb listing reviews section with topic chips such as Walkability 44 and Hospitality 210; reviewer names and photos are blurred',
+      pins: [{ top: 27, left: 54, note: 'Review topics with mention counts' }],
+    },
+  },
+  {
+    title: 'Checkout that keeps the guest in charge',
+    condition: 'Sense of control',
+    body: 'Checkout is two steps, with a progress bar. Dates and guests can be changed in place, the free-cancellation deadline is a real date, and the guest chooses when to be charged.',
+    shot: {
+      file: '09-checkout-control',
+      alt: 'Airbnb checkout step 1 of 2 showing dates, guests, total price, a free cancellation deadline and a choice of when to pay',
+      pins: [
+        { top: 46, left: 86, note: 'A date to cancel by, not a policy to decode' },
+        { top: 59.5, left: 68, note: 'Choose when to pay' },
+        { top: 90, left: 22, note: 'Step 1 of 2' },
+      ],
+    },
+  },
+];
+
+const interruptions = [
+  { screen: 'Home', items: ['Cookie consent dialog', '"Get the app" banner'], count: 2 },
+  { screen: 'Search results', items: [], count: 0 },
+  { screen: 'Listing', items: ['Translation notice, full screen', '"Rare find!" pop-up', '"Get the app" banner'], count: 3 },
+  { screen: 'Checkout', items: ['"Rare find" label, again'], count: 1 },
+];
+
+const matrix = [
+  { id: 'A', name: 'Inline translation notice', x: 20, y: 62, kind: 'ship' },
+  { id: 'B', name: 'One "Rare find" message, at the decision', x: 32, y: 84, kind: 'test' },
+  { id: 'C', name: 'App banner off listing pages', x: 62, y: 50, kind: 'later' },
+  { id: 'D', name: 'Cookie dialog', x: 84, y: 22, kind: 'constraint' },
+];
+---
+<article class="story story--airbnb">
+  <!-- Cover -->
+  <header class="story-cover wrap">
+    <div class="story-cover__copy">
+      <p class="eyebrow">Product teardown · self-initiated</p>
+      <h1>Airbnb's booking flow is built for flow. <em>Then it interrupts itself.</em></h1>
+      <p class="lede">
+        I booked a stay in Lisbon on Airbnb's mobile site and checked each screen against
+        Csikszentmihalyi's conditions for flow. Most of the journey is excellent. The friction
+        comes from a handful of messages competing for attention.
+      </p>
+    </div>
+    <figure class="phone phone--cover" aria-label="Screens from the session, cycling: the homepage, the translation notice, the Rare find pop-up and the sticky Rare find bar">
+      <div class="phone__screen phone__screen--cycle">
+        <img src={img('01-arrival')} alt="" width="780" height="1328" />
+        <img src={img('03-listing-translation-modal')} alt="" width="780" height="1328" />
+        <img src={img('04-listing-rare-find')} alt="" width="780" height="1328" />
+        <img src={img('08-sticky-rare-find')} alt="" width="780" height="1328" />
+      </div>
+      <figcaption class="phone__cap">Real screens from the session</figcaption>
+    </figure>
+  </header>
+
+  <!-- 01 Lens -->
+  <section class="chapter wrap">
+    <p class="chapter__num r">01 · The lens</p>
+    <h2 class="r">What flow asks of a product</h2>
+    <p class="chapter__lede r">
+      Psychologist Mihaly Csikszentmihalyi described flow as the state of being fully absorbed in
+      a task. A booking is a stressful, high-stakes task: money, dates and trust in a stranger's
+      home. Five of his conditions translate directly into product requirements.
+    </p>
+    <ol class="lens">
+      <li class="r"><b>Clear goals</b><span>The guest always knows the next step.</span></li>
+      <li class="r"><b>Immediate feedback</b><span>Each action shows its consequence, especially on price.</span></li>
+      <li class="r"><b>Concentration</b><span>Nothing competes with the task.</span></li>
+      <li class="r"><b>Sense of control</b><span>Mistakes are reversible, and commitments are explicit.</span></li>
+      <li class="r"><b>No self-consciousness</b><span>No pressure or anxiety pulling the guest out of the task.</span></li>
+    </ol>
+  </section>
+
+  <!-- 02 Method -->
+  <section class="chapter wrap">
+    <p class="chapter__num r">02 · Method</p>
+    <h2 class="r">One booking, every interruption counted</h2>
+    <p class="chapter__note r">
+      Mobile web on an emulated iPhone, logged out, English (UK), from Lithuania. Lisbon, 3 nights, 2 adults.
+      One session is a sample of one, so treat this as a set of hypotheses.
+    </p>
+    <ol class="path">
+      {interruptions.map((s, i) => (
+        <li class="path__step r">
+          <p class="path__screen"><span>{String(i + 1).padStart(2, '0')}</span>{s.screen}</p>
+          <p class:list={['path__count', { 'is-zero': s.count === 0 }]}><b>{s.count}</b> interruption{s.count === 1 ? '' : 's'}</p>
+          <ul>{s.items.length ? s.items.map((t) => <li>{t}</li>) : <li class="path__clear">Clear run</li>}</ul>
+        </li>
+      ))}
+    </ol>
+    <p class="pull r">
+      Five interruptions before I saw the first listing photo clearly. Search results, the part that
+      needs the most concentration, had <strong>none</strong>.
+    </p>
+  </section>
+
+  <!-- 03 What works -->
+  <section class="chapter wrap">
+    <p class="chapter__num r">03 · What Airbnb gets right</p>
+    <h2 class="r">Four moments that protect flow</h2>
+    {keeps.map((k) => (
+      <div class="shot-row">
+        <figure class="phone r">
+          <div class="phone__screen">
+            <img src={img(k.shot.file)} alt={k.shot.alt} width="780" height="1328" loading="lazy" />
+            {k.shot.pins.map((p, j) => (
+              <span class="pin" style={`top:${p.top}%;left:${p.left}%;--k:${j}`} aria-hidden="true">{j + 1}</span>
+            ))}
+          </div>
+        </figure>
+        <div class="shot-row__notes r">
+          <p class="eyebrow">{k.condition}</p>
+          <h3>{k.title}</h3>
+          <p>{k.body}</p>
+          <ol class="pin-notes">
+            {k.shot.pins.map((p, j) => <li style={`--k:${j}`}><span>{j + 1}</span>{p.note}</li>)}
+          </ol>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- 04 Where it breaks -->
+  <section class="chapter wrap">
+    <p class="chapter__num r">04 · Where flow breaks</p>
+    <h2 class="r">Three messages pulling the other way</h2>
+
+    <div class="shot-row">
+      <figure class="phone r">
+        <div class="phone__screen">
+          <img src={img('01-arrival')} alt="Airbnb mobile homepage covered by a cookie consent dialog, with a Get the app banner above" width="780" height="1328" loading="lazy" />
+          <span class="pin" style="top:10.8%;left:62%;--k:0" aria-hidden="true">1</span>
+          <span class="pin" style="top:32%;left:91%;--k:1" aria-hidden="true">2</span>
+        </div>
+      </figure>
+      <div class="shot-row__notes r">
+        <p class="eyebrow">Arrival</p>
+        <h3>Two asks before the first search</h3>
+        <p>
+          A guest arrives with one goal, to search, and meets a banner pushing the app and a
+          consent dialog. Consent is a legal requirement in the EU, so it is a constraint, not a
+          choice. The app banner is a business choice, and it comes back on the listing page.
+        </p>
+        <ol class="pin-notes">
+          <li style="--k:0"><span>1</span>"Get the app", shown again on listing pages</li>
+          <li style="--k:1"><span>2</span>Cookie consent, required by law</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="shot-row shot-row--pair">
+      <figure class="phone r">
+        <div class="phone__screen">
+          <img src={img('03-listing-translation-modal')} alt="A full-screen Translation on notice covering an Airbnb listing as it opens" width="780" height="1328" loading="lazy" />
+          <span class="pin" style="top:44%;left:50%;--k:0" aria-hidden="true">1</span>
+        </div>
+      </figure>
+      <figure class="phone r">
+        <div class="phone__screen">
+          <img src={img('06-inline-translation')} alt="Further down the same listing, an inline note says some info has been automatically translated, with a Show original link" width="780" height="1328" loading="lazy" />
+          <span class="pin" style="top:22.5%;left:90%;--k:0" aria-hidden="true">2</span>
+        </div>
+      </figure>
+      <div class="shot-row__notes r">
+        <p class="eyebrow">Listing · first load</p>
+        <h3>A full-screen notice for something already said inline</h3>
+        <p>
+          The first translated listing opens under a full-screen "Translation on" notice that hides
+          the photos. Yet the same page already carries an inline line, "Some info has been
+          automatically translated. Show original". The information is useful. The full-screen
+          interruption isn't.
+        </p>
+        <ol class="pin-notes">
+          <li style="--k:0"><span>1</span>Full-screen notice on arrival</li>
+          <li style="--k:1"><span>2</span>The inline notice that already does the job</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="shot-row shot-row--pair">
+      <figure class="phone r">
+        <div class="phone__screen">
+          <img src={img('04-listing-rare-find')} alt="Airbnb listing with a Rare find, this place is usually booked pop-up near the Reserve button" width="780" height="1328" loading="lazy" />
+          <span class="pin" style="top:79%;left:92%;--k:0" aria-hidden="true">1</span>
+        </div>
+      </figure>
+      <figure class="phone r">
+        <div class="phone__screen">
+          <img src={img('08-sticky-rare-find')} alt="Further down the listing, a Rare find bar stays pinned above the Reserve button while scrolling" width="780" height="1328" loading="lazy" />
+          <span class="pin" style="top:83%;left:88%;--k:0" aria-hidden="true">2</span>
+        </div>
+      </figure>
+      <div class="shot-row__notes r">
+        <p class="eyebrow">Listing · every scroll position</p>
+        <h3>"Rare find", three times</h3>
+        <p>
+          A "Rare find! This place is usually booked" pop-up appears as the listing opens. Then the
+          same line stays pinned above the Reserve button through the whole page, and it appears
+          again in checkout. Scarcity can lift conversion. In flow terms, it adds the pressure the
+          rest of the design works hard to remove.
+        </p>
+        <ol class="pin-notes">
+          <li style="--k:0"><span>1</span>Pop-up as the page opens</li>
+          <li style="--k:1"><span>2</span>Pinned bar on every scroll position, then again in checkout</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Prioritise -->
+  <section class="chapter wrap">
+    <p class="chapter__num r">05 · Prioritise</p>
+    <h2 class="r">What to change first</h2>
+    <p class="chapter__note r">Placement is my judgement from one session, not measured impact.</p>
+    <div class="matrix-wrap">
+      <figure class="matrix r" aria-label="Effort versus flow impact for four changes">
+        <span class="matrix__y">Flow impact →</span>
+        <span class="matrix__x">Effort →</span>
+        {matrix.map((m, i) => (
+          <span class:list={['matrix__dot', `matrix__dot--${m.kind}`]} style={`left:${m.x}%;bottom:${m.y}%;--k:${i}`}>{m.id}</span>
+        ))}
+      </figure>
+      <ol class="matrix-key">
+        {matrix.map((m) => (
+          <li class="r">
+            <span class:list={['matrix__dot', 'matrix__dot--static', `matrix__dot--${m.kind}`]}>{m.id}</span>
+            <div>
+              <b>{m.name}</b>
+              <em>{{ ship: 'Ship directly', test: 'A/B test first', later: 'Needs a business case', constraint: 'Legal constraint' }[m.kind]}</em>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <div class="reasons">
+      <p class="r"><b>Ship A.</b> The inline notice already exists, so removing the full-screen version loses no information and carries little risk.</p>
+      <p class="r"><b>Test B.</b> Scarcity messaging probably drives bookings, so changing it needs evidence, not opinion.</p>
+      <p class="r"><b>Park C and D.</b> App installs are a business goal with their own case, and consent is required by law.</p>
+    </div>
+  </section>
+
+  <!-- 06 Experiment -->
+  <section class="chapter wrap">
+    <p class="chapter__num r">06 · The experiment</p>
+    <h2 class="r">Say "Rare find" once, at the moment of decision</h2>
+    <div class="variants">
+      <div class="variant r">
+        <p class="eyebrow">Control · today</p>
+        <ul><li>Pop-up as the listing opens</li><li>Pinned bar on every scroll position</li><li>Label in checkout</li></ul>
+      </div>
+      <div class="variant variant--test r">
+        <p class="eyebrow">Variant</p>
+        <ul><li>No pop-up</li><li>One line beside the price when the guest scrolls to the calendar or taps Reserve</li><li>Label in checkout unchanged</li></ul>
+      </div>
+    </div>
+    <dl class="exp">
+      <div class="r"><dt>Hypothesis</dt><dd>Showing scarcity once, at the decision point, keeps bookings level while reducing regret.</dd></div>
+      <div class="r"><dt>Primary metric</dt><dd>Listing view to completed booking</dd></div>
+      <div class="r"><dt>Regret signal</dt><dd>Cancellations within 48 hours of booking</dd></div>
+      <div class="r"><dt>Guardrail</dt><dd>Revenue per listing visitor</dd></div>
+      <div class="r"><dt>Ship if</dt><dd>Bookings hold within an agreed margin and early cancellations fall. I would set the margin from a baseline first.</dd></div>
+    </dl>
+  </section>
+
+  <!-- 07 Concept -->
+  <section class="chapter wrap">
+    <p class="chapter__num r">07 · Concept</p>
+    <h2 class="r">The same listing, with one message at a time</h2>
+    <div class="concept">
+      <figure class="phone phone--concept r" aria-label="Concept sketch of the listing page with an inline translation label and a single scarcity line next to the price">
+        <div class="phone__screen concept__screen">
+          <div class="concept__photo"><span>Listing photos, unobstructed</span></div>
+          <div class="concept__body">
+            <span class="concept__line concept__line--title"></span>
+            <span class="concept__chip">Translated · Show original</span>
+            <span class="concept__line"></span><span class="concept__line concept__line--short"></span>
+            <span class="concept__line"></span>
+          </div>
+          <div class="concept__bar">
+            <div><b>€258 total</b><span class="concept__scarce">Usually booked for these dates</span></div>
+            <span class="concept__btn">Reserve</span>
+          </div>
+        </div>
+        <figcaption class="phone__cap">My concept, not Airbnb's design</figcaption>
+      </figure>
+      <ul class="concept__notes">
+        <li class="r"><b>Photos first.</b> Nothing covers the listing as it opens.</li>
+        <li class="r"><b>Translation inline.</b> A small label near the description, as already exists further down.</li>
+        <li class="r"><b>Scarcity once.</b> One factual line next to the price, at the moment it matters.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Credits -->
+  <footer class="wrap story-credits">
+    <div class="r">
+      <p class="eyebrow">Limits</p>
+      <p>One logged-out session on mobile web, from the EU. The app, logged-in guests and other markets may behave differently. With access, I would check how often each interruption actually appears across sessions before anything else.</p>
+      <p class="story-credits__fine">Independent exercise. Not affiliated with or endorsed by Airbnb. Screenshots captured by me on 12 Nov 2026 for commentary, with hosts' and guests' names and photos blurred.</p>
+    </div>
+  </footer>
+</article>

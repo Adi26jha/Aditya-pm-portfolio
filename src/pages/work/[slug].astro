@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+// Unpublished projects are viewable in `npm run dev` only, so a draft can be
+// previewed without ever reaching the live site.
+export async function getStaticPaths() {
+  const all = await getCollection('work');
+  const visible = all
+    .filter((e) => e.data.published || import.meta.env.DEV)
+    .sort((a, b) => a.data.order - b.data.order);
+  return visible.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, next: visible[(i + 1) % visible.length] },
+  }));
+}
+
+const { entry, next } = Astro.props;
+const { Content } = await render(entry);
+const { title, summary, area, company, period, role, metrics, published } = entry.data;
+---
+<Base title={title} description={summary}>
+  <article class="wrap case">
+    {!published && <p class="draft-note">Draft. Only visible in local dev until <code>published: true</code>.</p>}
+    <a class="link" href="/#work"><span aria-hidden="true">←</span> All work</a>
+    <header class="case__head">
+      <p class="eyebrow">{area}</p>
+      <h1>{title}</h1>
+      <p class="lede">{summary}</p>
+    </header>
+    <dl class="case__metrics">
+      {metrics.map((m) => <div><dd>{m.value}</dd><dt>{m.label}</dt></div>)}
+    </dl>
+    <div class="case__layout">
+      <aside class="case__meta">
+        <p><span class="eyebrow">Company</span>{company}</p>
+        <p><span class="eyebrow">Role</span>{role}</p>
+        <p><span class="eyebrow">Year</span>{period}</p>
+      </aside>
+      <div class="prose"><Content /></div>
+    </div>
+    {next.id !== entry.id && (
+      <a class="case__next" href={`/work/${next.id}/`}>
+        <span class="eyebrow">Next case study</span>
+        <span class="case__next-title">{next.data.title} <span aria-hidden="true">→</span></span>
+      </a>
+    )}
+  </article>
+</Base>

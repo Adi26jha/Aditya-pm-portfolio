@@ -1,0 +1,173 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import {
+  profile, outcomes, principles, experience, education, skills, languages, independentWork,
+} from '../data/profile';
+import { teardowns } from '../data/teardowns';
+
+const studies = teardowns.filter((t) => t.published || import.meta.env.DEV);
+const work = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+---
+<Base>
+  <section class="wrap hero">
+    <div class="hero__copy">
+      <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Open to PM and APM roles in the EU</p>
+      <h1>I turn offline compliance and payment work into <em>product.</em></h1>
+      <p class="lede">
+        Product manager for B2B platforms in global hiring and payments, most recently at
+        Komp.AI, an EOR and COR platform. Developer and data-analyst background. Based in
+        Vilnius, studying Management of AI Solutions at VILNIUS TECH.
+      </p>
+      <div class="actions">
+        <a class="btn btn--solid" href="#work">See the work</a>
+        <a class="btn" href={profile.cv}>Download CV</a>
+      </div>
+    </div>
+
+    <aside class="statement" aria-label="Outcomes at Komp.AI">
+      <div class="statement__head">
+        <span>Statement of outcomes</span>
+        <span>Komp.AI, 2026</span>
+      </div>
+      <ol class="statement__rows">
+        {outcomes.map((o, i) => (
+          <li style={`--i:${i}`}>
+            <a href={o.href}>
+              <span class="statement__label">{o.metric}</span>
+              <span class="statement__leader" aria-hidden="true"></span>
+              <span class="statement__value">{o.value}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <p class="stamp">No sponsorship<br />required</p>
+    </aside>
+  </section>
+
+  <section class="wrap section" id="work">
+    <div class="section__head">
+      <p class="eyebrow">Selected work</p>
+      <h2>Five projects from Komp.AI</h2>
+    </div>
+    <ol class="work">
+      {work.map((item, i) => (
+        <li class="work__row" id={item.id}>
+          <div class="work__index">
+            <span>{String(i + 1).padStart(2, '0')}</span>
+            <span>{item.data.area}</span>
+          </div>
+          <div class="work__body">
+            <h3>
+              {item.data.published
+                ? <a href={`/work/${item.id}/`}>{item.data.title}</a>
+                : item.data.title}
+            </h3>
+            <p>{item.data.summary}</p>
+            {item.data.published && (
+              <a class="link" href={`/work/${item.id}/`}>Read the case study <span aria-hidden="true">→</span></a>
+            )}
+          </div>
+          <dl class="work__metrics">
+            {item.data.metrics.map((m) => (
+              <div>
+                <dd>{m.value}</dd>
+                <dt>{m.label}</dt>
+              </div>
+            ))}
+          </dl>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  {studies.length > 0 && (
+    <section class="wrap section section--tight">
+      <div class="section__head">
+        <p class="eyebrow">Product thinking</p>
+        <h2>Self-initiated teardowns</h2>
+      </div>
+      {studies.map((t) => (
+        <a class="teardown" href={`/case-studies/${t.slug}/`}>
+          <div>
+            <p class="eyebrow">{t.tags.join(' · ')}</p>
+            <h3>{t.title}</h3>
+            <p>{t.summary}</p>
+          </div>
+          <span class="teardown__cta">Read · {t.readTime} <span aria-hidden="true">→</span></span>
+        </a>
+      ))}
+    </section>
+  )}
+
+  <section class="wrap section">
+    <div class="section__head">
+      <p class="eyebrow">Independent work</p>
+      <h2>Live sites I scoped and built</h2>
+    </div>
+    <div class="builds">
+      {independentWork.map((b) => (
+        <a class="build" href={b.url}>
+          <img src={b.image} alt={b.alt} width="1280" height="800" loading="lazy" />
+          <div class="build__caption">
+            <h3>{b.name} <span class="mono">{b.domain} ↗</span></h3>
+            <p>{b.body}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="band" id="approach">
+    <div class="wrap section">
+      <div class="section__head">
+        <p class="eyebrow">Approach</p>
+        <h2>How the work gets done</h2>
+      </div>
+      <ol class="principles">
+        {principles.map((p) => (
+          <li>
+            <h3>{p.title}</h3>
+            <p>{p.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="wrap section" id="experience">
+    <div class="section__head">
+      <p class="eyebrow">Experience</p>
+      <h2>From front-end to product</h2>
+    </div>
+    <ol class="timeline">
+      {experience.map((e) => (
+        <li>
+          <p class="timeline__period">{e.period}</p>
+          <div>
+            <h3>{e.role}</h3>
+            <p class="timeline__company">{e.company}{e.note && `, ${e.note}`}</p>
+            <p>{e.detail}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="facts">
+      <div>
+        <h3 class="eyebrow">Education</h3>
+        {education.map((e) => (
+          <p><strong>{e.degree}</strong><br />{e.school}<br /><span class="mono">{e.period}</span></p>
+        ))}
+      </div>
+      <div>
+        <h3 class="eyebrow">Skills</h3>
+        {skills.map((s) => <p><strong>{s.group}</strong><br />{s.items}</p>)}
+      </div>
+      <div>
+        <h3 class="eyebrow">Languages</h3>
+        <p>{languages}</p>
+      </div>
+    </div>
+  </section>
+</Base>

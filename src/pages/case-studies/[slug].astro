@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import PlayStation5 from '../../components/teardowns/PlayStation5.astro';
+import AirbnbFlow from '../../components/teardowns/AirbnbFlow.astro';
+import { teardowns } from '../../data/teardowns';
+import '../../styles/story.css';
+
+const components = { 'playstation-5': PlayStation5, 'airbnb-flow': AirbnbFlow } as const;
+
+export function getStaticPaths() {
+  return teardowns
+    .filter((t) => t.published || import.meta.env.DEV)
+    .map((t) => ({ params: { slug: t.slug }, props: { teardown: t } }));
+}
+
+const { teardown } = Astro.props;
+const Story = components[teardown.slug as keyof typeof components];
+---
+<Base title={teardown.title} description={teardown.summary}>
+  <script is:inline>document.documentElement.classList.add('story-js');</script>
+  <div class="story-progress" aria-hidden="true"><span></span></div>
+  {!teardown.published && (
+    <div class="wrap"><p class="draft-note" style="margin-top:24px">Draft. Only visible in local dev until <code>published: true</code> in src/data/teardowns.ts.</p></div>
+  )}
+  <Story />
+</Base>
+
+<script>
+  // Every `.story .r` element gets `.in` when it scrolls into view. Elements that
+  // arrive together are staggered in document order, and nested illustrations
+  // animate off their `.r` ancestor. Without JS or with reduced motion,
+  // everything is shown at once.
+  const root = document.documentElement;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const items = document.querySelectorAll<HTMLElement>('.story .r');
+
+  if (reduce || !('IntersectionObserver' in window)) {
+    items.forEach((el) => el.classList.add('in'));
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries
+          .filter((e) => e.isIntersecting)
+          .forEach((e, i) => {
+            const el = e.target as HTMLElement;
+            el.style.setProperty('--delay', `${i * 110}ms`);
+            el.classList.add('in');
+            io.unobserve(el);
+          });
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.15 },
+    );
+    items.forEach((el) => io.observe(el));
+  }
+
+  const bar = document.querySelector<HTMLElement>('.story-progress span');
+  if (bar) {
+    let ticking = false;
+    const update = () => {
+      const max = root.scrollHeight - window.innerHeight;
+      bar.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+      ticking = false;
+    };
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  }
+</script>
